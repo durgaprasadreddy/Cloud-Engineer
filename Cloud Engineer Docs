@@ -1,1 +1,25 @@
-Test
+RBAC 
+--------------------------------
+# List all Roles in all namespaces
+kubectl get roles --all-namespaces
+
+# Count all Roles across namespaces
+kubectl get roles --all-namespaces | wc -l
+
+# List all RoleBindings in all namespaces
+kubectl get rolebindings --all-namespaces
+
+# Count all RoleBindings across namespaces
+kubectl get rolebindings --all-namespaces | wc -l
+
+# List all ClusterRoles
+kubectl get clusterroles
+
+# Count all ClusterRoles
+kubectl get clusterroles | wc -l
+
+# List all ClusterRoleBindings
+kubectl get clusterrolebindings
+
+# Count all ClusterRoleBindings
+kubectl get clusterrolebindings | wc -l
