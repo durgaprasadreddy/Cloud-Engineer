@@ -1,5 +1,20 @@
 RBAC 
 --------------------------------
+
+kubectl get roles --all-namespaces
+kubectl get rolebindings --all-namespaces
+kubectl get clusterroles
+kubectl get clusterrolebindings
+
+
+kubectl edit configmap aws-auth -n kube-system
+kubectl get serviceaccount <service-account-name> -n <namespace> -o yaml
+
+kubectl get roles --all-namespaces
+kubectl get rolebindings --all-namespaces
+kubectl get clusterroles
+kubectl get clusterrolebindings
+
 # List all Roles in all namespaces
 kubectl get roles --all-namespaces
 
