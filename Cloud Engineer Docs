@@ -38,3 +38,10 @@ kubectl get clusterrolebindings
 
 # Count all ClusterRoleBindings
 kubectl get clusterrolebindings | wc -l
+
+
+Service accounts
+kubectl get serviceaccounts --all-namespaces
+kubectl get serviceaccounts --all-namespaces | tail -n +2 | wc -l
+kubectl get serviceaccounts --all-namespaces | awk '{print $1}' | sort | uniq -c
+
