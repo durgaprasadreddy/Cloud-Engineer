@@ -384,4 +384,5 @@ sudo systemctl restart amazon-cloudwatch-agent
 
 
 
-
+Amazon Cognito for user authentication and OTP configuration.
+Amazon SNS to send SMS messages across multiple countries.
