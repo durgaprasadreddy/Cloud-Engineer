@@ -372,3 +372,16 @@ export PATH=/usr/local/pgsql/bin:$PATH
 
 source /etc/profile
 ===============================
+
+
+Cloudwatch agent troubleshoot
+
+dpkg -l | grep amazon-cloudwatch-agent
+sudo systemctl status amazon-cloudwatch-agent
+/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log
+tail -f /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log
+sudo systemctl restart amazon-cloudwatch-agent
+
+
+
+
