@@ -418,3 +418,18 @@ aws resource-explorer-2 search \
     --max-results 1000 \
     --region eu-west-1 | jq '.Results[] | {ARN: .Arn, ResourceType: .ResourceType, Tags: .Tags}'
 
+------------------------------
+
+
+# Step 1: Fetch the resources and create a detailed CSV file with headers
+{
+  echo "ResourceARN,ApplicationName,DeveloperTagValue"  # Add headers to CSV
+  aws resourcegroupstaggingapi get-resources \
+    --tag-filters Key=developer \
+    --query 'ResourceTagMappingList[*].[ResourceARN, Tags[?Key==application-name].Value | [0], Tags[?Key==developer].Value | [0]]' \
+    --output text | tr '\t' ','  # Replace tabs with commas for CSV format
+} > tags.csv
+
+----
+aws s3 cp tags.csv s3://s3-ytest/tags.csv
+----------------------------------
