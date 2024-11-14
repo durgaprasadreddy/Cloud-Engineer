@@ -394,3 +394,12 @@ aws resource-explorer-2 search --query "resource type" --max-results 1000 --regi
 # Fetch resources with the specified tag and count them
 aws resource-explorer-2 search --query "tag:migrated=true" --max-results 1000 --region us-east-1
 
+cat output.json | jq '.Results[] | {ARN: .Arn, ResourceType: .ResourceType, Tags: .Tags}'
+
+
+
+# Fetch resources with the specified tag and limit to 1000 results per page
+aws resource-explorer-2 search \
+    --query "tag:migrated=true" \
+    --max-results 1000 \
+    --region us-east-1 > output.json
