@@ -403,3 +403,18 @@ aws resource-explorer-2 search \
     --query "tag:migrated=true" \
     --max-results 1000 \
     --region us-east-1 > output.json
+
+
+
+
+aws resource-explorer-2 search \
+    --query "tag:migrated=true" \
+    --max-results 1000 \
+    --region eu-west-1
+
+
+aws resource-explorer-2 search \
+    --query "tag:migrated=true" \
+    --max-results 1000 \
+    --region eu-west-1 | jq '.Results[] | {ARN: .Arn, ResourceType: .ResourceType, Tags: .Tags}'
+
