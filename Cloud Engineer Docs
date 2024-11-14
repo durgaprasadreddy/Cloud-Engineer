@@ -433,3 +433,48 @@ aws resource-explorer-2 search \
 ----
 aws s3 cp tags.csv s3://s3-ytest/tags.csv
 ----------------------------------
+
+
+
+Step 1: Fetch Resource Explorer Data
+We'll use the resource-explorer-2 search command to fetch the resources.
+
+bash
+Copy code
+aws resource-explorer-2 search \
+    --query "tag:migrated=true" \
+    --region eu-west-1 \
+    --output json > resource_explorer_output.json
+This will save the results to a JSON file named resource_explorer_output.json.
+
+Step 2: Extract Relevant Fields and Convert to CSV
+We'll use jq to extract the fields (ARN, resourceType, and region) and convert the data into CSV format.
+
+bash
+Copy code
+jq -r '.Results[] | [.Arn, .ResourceType, .Region] | @csv' resource_explorer_output.json > resource_explorer_data.csv
+Explanation of the jq Command
+.Results[]: Iterates through each result in the JSON array.
+[.Arn, .ResourceType, .Region]: Extracts the fields Arn, ResourceType, and Region.
+@csv: Converts the extracted fields to CSV format.
+The -r flag ensures the output is in raw format (without quotes around each line).
+Step 3: Verify the CSV File
+Check the contents of the CSV file:
+
+bash
+Copy code
+cat resource_explorer_data.csv
+Output should look something like:
+
+arduino
+Copy code
+"arn:aws:s3:::example-bucket","AWS::S3::Bucket","eu-west-1"
+"arn:aws:ec2:eu-west-1:123456789012:instance/i-0abcd1234efgh5678","AWS::EC2::Instance","eu-west-1"
+...
+Step 4: Upload CSV File to S3
+To upload the CSV file to an S3 bucket:
+
+bash
+Copy code
+aws s3 cp resource_explorer_data.csv s3://your-s3-bucket/path/to/resource_explorer_data.csv
+
