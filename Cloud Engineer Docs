@@ -478,3 +478,118 @@ bash
 Copy code
 aws s3 cp resource_explorer_data.csv s3://your-s3-bucket/path/to/resource_explorer_data.csv
 
+
+---------------------------------
+
+
+The most important AWS services to monitor and perform health checks on depend on your environment, but the following are universally critical across most setups:
+
+1. Compute Services
+EC2 Instances:
+
+Check instance status (System/Instance Checks).
+Monitor CPU, memory, disk I/O, and network performance.
+Verify instance reachability and uptime.
+EKS (Elastic Kubernetes Service):
+
+Monitor cluster health, node status, and pod readiness.
+Ensure critical pods are not in crash loops or pending states.
+Check the health of services deployed on the cluster.
+Lambda Functions:
+
+Monitor invocation errors, duration, and throttling.
+Verify event trigger integrations (e.g., S3, API Gateway).
+Ensure no outdated or inactive Lambda versions exist.
+2. Networking
+Elastic Load Balancers (ALB/NLB/CLB):
+
+Health of registered targets and listener configurations.
+Monitor HTTP response codes (e.g., 5xx errors) and latency.
+VPC Components:
+
+Ensure NAT Gateways and Internet Gateways are functional.
+Verify routing tables, subnets, and NACLs.
+Check VPN connections or Direct Connect links.
+3. Database Services
+RDS and Aurora:
+
+Monitor CPU, memory, IOPS, and connection limits.
+Verify backups, automated snapshots, and replica health.
+Ensure no performance degradation or read replica lag.
+ElastiCache (Redis/Memcached):
+
+Monitor cluster/node availability, memory usage, and connection errors.
+Check replication status and cache hit/miss ratios.
+DynamoDB:
+
+Monitor provisioned capacity and throttled requests.
+Check for latency and ensure global table health if used.
+4. Storage Services
+S3:
+
+Verify bucket access policies and permissions.
+Monitor request success/failure rates and latency.
+Check lifecycle rules for automated data management.
+EFS (Elastic File System):
+
+Monitor throughput, burst credits, and active clients.
+Verify file system health and ensure connectivity.
+EBS (Elastic Block Store):
+
+Monitor IOPS, throughput, and snapshot completion.
+Check for degraded or impaired volumes.
+5. Security and Compliance
+IAM:
+
+Check for unused users, roles, or keys.
+Review policies for overly permissive access.
+GuardDuty:
+
+Monitor for unusual or unauthorized activities.
+AWS Config:
+
+Ensure resources comply with organizational policies.
+WAF & Shield:
+
+Monitor blocked requests and DDoS attack metrics.
+6. Logging and Monitoring
+CloudWatch:
+
+Monitor key metrics like CPU, memory, and custom app logs.
+Ensure alarms are configured and active for critical resources.
+CloudTrail:
+
+Verify logging is enabled for all accounts.
+Ensure logs are being delivered to S3 and analyzed for anomalies.
+7. Application and CI/CD
+API Gateway:
+
+Monitor error rates, latency, and cache performance.
+Check integration points (Lambda, EC2, DynamoDB).
+ECR (Elastic Container Registry):
+
+Monitor image scans for vulnerabilities.
+Check permissions and image availability.
+CodePipeline/CodeBuild:
+
+Verify build and deployment logs for issues.
+Monitor execution status and identify failures.
+8. Other Essential Services
+AWS Backup:
+
+Ensure all critical resources are included in backup plans.
+Monitor backup job success/failure rates.
+Secrets Manager & Parameter Store:
+
+Monitor secret rotation jobs.
+Verify encryption and access policies.
+Priority Monitoring Services
+For critical systems, focus on these top-priority services:
+
+Compute: EC2, EKS, Lambda
+Networking: VPC, Load Balancers
+Storage: S3, EFS, RDS
+Security: GuardDuty, WAF, IAM
+Monitoring: CloudWatch, CloudTrail
+Would you like help setting up monitoring tools or CloudWatch alarms for any of these services?
+
