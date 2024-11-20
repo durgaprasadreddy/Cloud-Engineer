@@ -593,3 +593,117 @@ Security: GuardDuty, WAF, IAM
 Monitoring: CloudWatch, CloudTrail
 Would you like help setting up monitoring tools or CloudWatch alarms for any of these services?
 
+====================================================================================================
+
+
+
+checklist of AWS services to verify their health:
+
+Core Compute Services
+EC2 Instances
+
+Check CPU, memory, and disk utilization.
+Verify instance status checks (System/Instance Checks).
+Monitor instance reachability via CloudWatch alarms.
+EKS Clusters
+
+Confirm node health (ready state of nodes).
+Monitor pod statuses (running, pending, or crash-loop states).
+Ensure API server connectivity and response time.
+Check deployments, stateful sets, and daemon sets.
+Lambda Functions
+
+Monitor invocation errors and durations.
+Check for throttling or timeout issues.
+Validate trigger integrations (e.g., S3, API Gateway).
+Networking Services
+Load Balancers (ELB/ALB/NLB)
+
+Verify listener and target group health.
+Check for failed health checks.
+Monitor latency and HTTP response codes.
+VPC Components
+
+Ensure NAT Gateways are functional.
+Validate VPN and Direct Connect health.
+Check Route Tables and NACL configurations.
+Database Services
+RDS/ Aurora
+
+Monitor storage space, CPU, and connections.
+Check read replica lag.
+Ensure backups and automated snapshots are running.
+ElastiCache (Redis/Memcached)
+
+Validate replication group status.
+Monitor memory usage and eviction rates.
+Check cluster availability and connection errors.
+DynamoDB
+
+Monitor provisioned throughput (read/write).
+Check for throttled requests.
+Storage Services
+S3
+
+Verify bucket access policies and permissions.
+Check for recent failed requests or latency spikes.
+EFS
+
+Monitor burst credits and throughput.
+Verify mounted clients’ connectivity.
+EBS
+
+Check volume performance (IOPS, throughput).
+Monitor snapshots for completion status.
+Monitoring & Logging Services
+CloudWatch
+
+Verify log streams and metric data availability.
+Monitor alarm statuses for critical metrics.
+CloudTrail
+
+Ensure logs are being delivered to the S3 bucket.
+Verify the integrity of logs for compliance.
+Security Services
+IAM Roles/Policies
+
+Ensure roles/policies are not overly permissive.
+Check for unauthorized activity in the access analyzer.
+WAF & Shield
+
+Confirm web ACL health and blocked request metrics.
+Monitor DDoS attack mitigation status.
+GuardDuty
+
+Review recent findings for security threats.
+DevOps & CI/CD
+CodePipeline/CodeBuild
+
+Check pipeline execution status and recent failures.
+Verify build logs for errors or warnings.
+ECR (Elastic Container Registry)
+
+Ensure images are accessible.
+Monitor scan results for vulnerabilities.
+Analytics & Messaging Services
+CloudFront
+
+Monitor cache hit/miss ratios and distribution health.
+Check for invalidation request processing.
+SNS & SQS
+
+Verify message delivery and receipt statistics.
+Check for queue overflows or dead-letter queues.
+Others
+Parameter Store & Secrets Manager
+
+Ensure secret rotations are happening as scheduled.
+Verify permissions and encryption (KMS).
+AWS Backup
+
+Ensure backups are completing successfully.
+Monitor restore jobs for failures.
+
+
+
+======================================
