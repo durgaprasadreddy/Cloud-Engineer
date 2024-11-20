@@ -1092,3 +1092,365 @@ Replace <resource-type> with pod, deployment, service, etc.
 Use -n <namespace> to specify the project/namespace if it’s not the current context.
 For YAML manipulation, you can also use kubectl commands as OpenShift is Kubernetes-compatible.
 
+=================================================
+
+openshift list of commands for crud operations and troubleshooting
+
+2/2
+
+ChatGPT said:
+ChatGPT
+Below is a list of OpenShift commands categorized by CRUD (Create, Read, Update, Delete) operations and troubleshooting tasks. These commands utilize the oc CLI tool, which is OpenShift's client tool.
+
+CRUD Operations
+Create
+Create a new project (namespace):
+bash
+Copy code
+oc new-project <project-name>
+Deploy an application from an image:
+bash
+Copy code
+oc new-app <image-name> --name=<app-name>
+Create a new route for a service:
+bash
+Copy code
+oc expose svc/<service-name>
+Apply a YAML or JSON manifest:
+bash
+Copy code
+oc apply -f <manifest-file.yaml>
+Create a ConfigMap:
+bash
+Copy code
+oc create configmap <configmap-name> --from-literal=<key>=<value>
+Create a Secret:
+bash
+Copy code
+oc create secret generic <secret-name> --from-literal=<key>=<value>
+Read
+List all projects:
+bash
+Copy code
+oc get projects
+List all pods in the current project:
+bash
+Copy code
+oc get pods
+Describe a specific pod:
+bash
+Copy code
+oc describe pod <pod-name>
+Get logs for a pod:
+bash
+Copy code
+oc logs <pod-name>
+View YAML of a resource:
+bash
+Copy code
+oc get <resource-type> <resource-name> -o yaml
+Check events in the current namespace:
+bash
+Copy code
+oc get events
+Update
+Edit a resource configuration:
+bash
+Copy code
+oc edit <resource-type> <resource-name>
+Scale a deployment:
+bash
+Copy code
+oc scale deployment/<deployment-name> --replicas=<number-of-replicas>
+Rollout a new version:
+bash
+Copy code
+oc rollout restart deployment/<deployment-name>
+Patch a resource:
+bash
+Copy code
+oc patch <resource-type> <resource-name> --type=json -p='[{"op": "replace", "path": "/spec/replicas", "value": <value>}]'
+Delete
+Delete a pod:
+bash
+Copy code
+oc delete pod <pod-name>
+Delete a service:
+bash
+Copy code
+oc delete svc <service-name>
+Delete a route:
+bash
+Copy code
+oc delete route <route-name>
+Delete a project:
+bash
+Copy code
+oc delete project <project-name>
+Delete using a manifest file:
+bash
+Copy code
+oc delete -f <manifest-file.yaml>
+Troubleshooting Commands
+View events in a project:
+bash
+Copy code
+oc get events -n <project-name>
+Debug a pod (opens a shell):
+bash
+Copy code
+oc debug pod/<pod-name>
+Inspect logs of a failing pod:
+bash
+Copy code
+oc logs <pod-name> --previous
+Check network connectivity from a pod:
+bash
+Copy code
+oc rsh <pod-name> curl <service-name>
+Get resource usage (CPU/Memory):
+bash
+Copy code
+oc adm top pods
+Debug node issues:
+bash
+Copy code
+oc adm node-logs <node-name>
+Check cluster status:
+bash
+Copy code
+oc get clusterversion
+Troubleshoot DNS issues:
+bash
+Copy code
+oc rsh <pod-name> nslookup <service-name>
+Tips
+Replace <resource-type> with pod, deployment, service, etc.
+Use -n <namespace> to specify the project/namespace if it’s not the current context.
+For YAML manipulation, you can also use kubectl commands as OpenShift is Kubernetes-compatible.
+Let me know if you need further details!
+
+
+
+
+
+
+You said:
+ocp adminstration list of commands and crud operation commands aswell troubleshooting commands
+ChatGPT said:
+ChatGPT
+Here’s a comprehensive list of OpenShift (OCP) administration commands, CRUD operation commands, and troubleshooting commands, categorized for clarity.
+
+OpenShift Administration Commands
+User and Access Management
+Create a new user (identity provider-specific):
+bash
+Copy code
+oc create user <username>
+Assign a role to a user:
+bash
+Copy code
+oc adm policy add-role-to-user <role> <user> -n <namespace>
+List roles in a namespace:
+bash
+Copy code
+oc get roles -n <namespace>
+Remove a user from a role:
+bash
+Copy code
+oc adm policy remove-role-from-user <role> <user> -n <namespace>
+Node Management
+List all nodes:
+bash
+Copy code
+oc get nodes
+Cordon a node (prevent new pods):
+bash
+Copy code
+oc adm cordon <node-name>
+Uncordon a node:
+bash
+Copy code
+oc adm uncordon <node-name>
+Drain a node (migrate pods):
+bash
+Copy code
+oc adm drain <node-name> --ignore-daemonsets --delete-emptydir-data
+Cluster Management
+Check cluster operators:
+bash
+Copy code
+oc get clusteroperators
+Get cluster version:
+bash
+Copy code
+oc get clusterversion
+Check cluster status:
+bash
+Copy code
+oc status
+Configure a cluster-wide proxy:
+bash
+Copy code
+oc create -f <proxy-config.yaml>
+Backup etcd data:
+bash
+Copy code
+oc adm dump etcd
+Project Management
+Create a new project:
+bash
+Copy code
+oc adm new-project <project-name> --admin=<username>
+Delete a project:
+bash
+Copy code
+oc delete project <project-name>
+List all projects:
+bash
+Copy code
+oc get projects
+Quotas and Limits
+Set resource quotas in a namespace:
+bash
+Copy code
+oc create quota <quota-name> --hard=cpu=4,memory=16Gi -n <namespace>
+View resource quotas in a namespace:
+bash
+Copy code
+oc get quota -n <namespace>
+Registry Management
+List images in the registry:
+bash
+Copy code
+oc get images
+List image streams:
+bash
+Copy code
+oc get is -n <namespace>
+Promote an image to another project:
+bash
+Copy code
+oc tag <namespace>/<image>:<tag> <target-namespace>/<image>:<new-tag>
+CRUD Operation Commands
+Create
+Create a new deployment:
+bash
+Copy code
+oc create deployment <name> --image=<image>
+Apply a YAML or JSON file:
+bash
+Copy code
+oc apply -f <file.yaml>
+Create a service:
+bash
+Copy code
+oc expose deployment/<deployment-name> --port=<port>
+Read
+List resources:
+bash
+Copy code
+oc get <resource-type>
+Example:
+bash
+Copy code
+oc get pods
+Describe a resource:
+bash
+Copy code
+oc describe <resource-type> <resource-name>
+View resource YAML/JSON:
+bash
+Copy code
+oc get <resource-type> <resource-name> -o yaml
+Update
+Edit a resource:
+bash
+Copy code
+oc edit <resource-type> <resource-name>
+Scale a deployment:
+bash
+Copy code
+oc scale deployment/<deployment-name> --replicas=<number>
+Patch a resource:
+bash
+Copy code
+oc patch <resource-type> <resource-name> --patch='{"spec": {"key": "value"}}'
+Delete
+Delete a resource:
+bash
+Copy code
+oc delete <resource-type> <resource-name>
+Example:
+bash
+Copy code
+oc delete pod <pod-name>
+Delete using a manifest file:
+bash
+Copy code
+oc delete -f <file.yaml>
+Troubleshooting Commands
+Cluster and Node Health
+View cluster events:
+bash
+Copy code
+oc get events -A
+Check node health:
+bash
+Copy code
+oc get nodes -o wide
+Node logs:
+bash
+Copy code
+oc adm node-logs <node-name>
+Pod and Application Issues
+Check pod logs:
+bash
+Copy code
+oc logs <pod-name>
+Get logs of a previous container instance:
+bash
+Copy code
+oc logs <pod-name> --previous
+Debug a pod:
+bash
+Copy code
+oc debug pod/<pod-name>
+Networking
+Test DNS resolution inside a pod:
+bash
+Copy code
+oc rsh <pod-name> nslookup <service-name>
+Check network connectivity from a pod:
+bash
+Copy code
+oc rsh <pod-name> curl <service-endpoint>
+Resource Utilization
+View pod resource usage:
+bash
+Copy code
+oc adm top pods
+View node resource usage:
+bash
+Copy code
+oc adm top nodes
+Cluster Logs
+Check operator logs:
+bash
+Copy code
+oc logs -n openshift-operator-lifecycle-manager <pod-name>
+Etcd logs:
+bash
+Copy code
+oc logs -n openshift-etcd <pod-name>
+Miscellaneous
+Check RBAC policies:
+bash
+Copy code
+oc get roles -n <namespace>
+Check PVC usage:
+bash
+Copy code
+oc describe pvc <pvc-name>
+This list covers key commands for OpenShift administrators, developers, and troubleshooting. Let me know if you'd like a tailored set of commands for any specific use case!
+===============================================================
