@@ -963,3 +963,132 @@ Real-time updates and tagging.
 Would you like help setting up a specific platform for centralizing this BRF?
 
 --------------------------------------------------
+OpenShift commands categorized by CRUD (Create, Read, Update, Delete) operations and troubleshooting tasks. 
+
+CRUD Operations
+Create
+Create a new project (namespace):
+bash
+Copy code
+oc new-project <project-name>
+Deploy an application from an image:
+bash
+Copy code
+oc new-app <image-name> --name=<app-name>
+Create a new route for a service:
+bash
+Copy code
+oc expose svc/<service-name>
+Apply a YAML or JSON manifest:
+bash
+Copy code
+oc apply -f <manifest-file.yaml>
+Create a ConfigMap:
+bash
+Copy code
+oc create configmap <configmap-name> --from-literal=<key>=<value>
+Create a Secret:
+bash
+Copy code
+oc create secret generic <secret-name> --from-literal=<key>=<value>
+Read
+List all projects:
+bash
+Copy code
+oc get projects
+List all pods in the current project:
+bash
+Copy code
+oc get pods
+Describe a specific pod:
+bash
+Copy code
+oc describe pod <pod-name>
+Get logs for a pod:
+bash
+Copy code
+oc logs <pod-name>
+View YAML of a resource:
+bash
+Copy code
+oc get <resource-type> <resource-name> -o yaml
+Check events in the current namespace:
+bash
+Copy code
+oc get events
+Update
+Edit a resource configuration:
+bash
+Copy code
+oc edit <resource-type> <resource-name>
+Scale a deployment:
+bash
+Copy code
+oc scale deployment/<deployment-name> --replicas=<number-of-replicas>
+Rollout a new version:
+bash
+Copy code
+oc rollout restart deployment/<deployment-name>
+Patch a resource:
+bash
+Copy code
+oc patch <resource-type> <resource-name> --type=json -p='[{"op": "replace", "path": "/spec/replicas", "value": <value>}]'
+Delete
+Delete a pod:
+bash
+Copy code
+oc delete pod <pod-name>
+Delete a service:
+bash
+Copy code
+oc delete svc <service-name>
+Delete a route:
+bash
+Copy code
+oc delete route <route-name>
+Delete a project:
+bash
+Copy code
+oc delete project <project-name>
+Delete using a manifest file:
+bash
+Copy code
+oc delete -f <manifest-file.yaml>
+Troubleshooting Commands
+View events in a project:
+bash
+Copy code
+oc get events -n <project-name>
+Debug a pod (opens a shell):
+bash
+Copy code
+oc debug pod/<pod-name>
+Inspect logs of a failing pod:
+bash
+Copy code
+oc logs <pod-name> --previous
+Check network connectivity from a pod:
+bash
+Copy code
+oc rsh <pod-name> curl <service-name>
+Get resource usage (CPU/Memory):
+bash
+Copy code
+oc adm top pods
+Debug node issues:
+bash
+Copy code
+oc adm node-logs <node-name>
+Check cluster status:
+bash
+Copy code
+oc get clusterversion
+Troubleshoot DNS issues:
+bash
+Copy code
+oc rsh <pod-name> nslookup <service-name>
+Tips
+Replace <resource-type> with pod, deployment, service, etc.
+Use -n <namespace> to specify the project/namespace if it’s not the current context.
+For YAML manipulation, you can also use kubectl commands as OpenShift is Kubernetes-compatible.
+
