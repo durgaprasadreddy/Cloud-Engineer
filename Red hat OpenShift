@@ -1,1 +1,12 @@
-test
+
+https://www.youtube.com/watch?v=ElhpkEaAM5Y&list=PLnFCwVWiQz4nFE9X6ADRTtBvZDIrIAL1u
+OpenShift Cluster Installation, Architecture, Demo (OpenShift Administration Part-1) Red Hat Ex280
+
+Commands --
+oc new-project chapter1
+oc new-app --name hello --image quay.io/redhattraining/hello-world-nginx:v1.0
+oc expose service hello
+oc get all
+oc get pod -o wide
+oc scale --replicas 4 deployment/hello
+oc delete project chapter1
