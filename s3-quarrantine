@@ -1,0 +1,71 @@
+import boto3
+import os
+import logging
+
+# Initialize the S3 client
+s3 = boto3.client('s3')
+
+# Set up logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+def lambda_handler(event, context):
+    try:
+        # Log the incoming event
+        logger.info(f"Event Received: {event}")
+
+        # Parse S3 bucket and object key from the event
+        bucket_name = event['Records'][0]['s3']['bucket']['name']
+        file_key = event['Records'][0]['s3']['object']['key']
+        logger.info(f"Bucket: {bucket_name}, File: {file_key}")
+
+        # Define local paths for processing
+        download_path = f"/tmp/{os.path.basename(file_key)}"
+        logger.info(f"Downloading file to: {download_path}")
+
+        # Download the file from S3
+        s3.download_file(bucket_name, file_key, download_path)
+
+        # Dummy scan logic (replace with your scanner integration)
+        scan_result = dummy_file_scan(download_path)
+
+        # Post-scan actions: Move file to clean or quarantine folder
+        if scan_result == "clean":
+            target_key = f"clean/{file_key}"
+            logger.info(f"File is clean. Moving to: {target_key}")
+        else:
+            target_key = f"quarantine/{file_key}"
+            logger.info(f"File is infected. Moving to: {target_key}")
+
+        # Copy the file to the target folder
+        s3.copy_object(
+            Bucket=bucket_name,
+            CopySource={'Bucket': bucket_name, 'Key': file_key},
+            Key=target_key
+        )
+
+        # Optionally delete the original file
+        logger.info(f"Deleting original file: {file_key}")
+        s3.delete_object(Bucket=bucket_name, Key=file_key)
+
+        return {
+            'statusCode': 200,
+            'body': f"File processed successfully. Moved to: {target_key}"
+        }
+
+    except Exception as e:
+        logger.error(f"Error processing file: {str(e)}")
+        return {
+            'statusCode': 500,
+            'body': f"Error: {str(e)}"
+        }
+
+def dummy_file_scan(file_path):
+    """
+    Dummy function to simulate a file scan. Replace this with actual scan logic.
+    Returns 'clean' or 'infected'.
+    """
+    # For demonstration, consider files with ".infected" as infected
+    if file_path.endswith(".infected"):
+        return "infected"
+    return "clean"
