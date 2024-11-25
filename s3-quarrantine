@@ -1,71 +1,128 @@
-import boto3
-import os
+import json
 import logging
+import time
+import boto3
 
-# Initialize the S3 client
-s3 = boto3.client('s3')
-
-# Set up logging
+# Initialize logging and clients
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+macie2 = boto3.client('macie2')  # Macie client to interact with Amazon Macie
+s3 = boto3.client('s3')          # S3 client to move the files
+
 def lambda_handler(event, context):
     try:
-        # Log the incoming event
-        logger.info(f"Event Received: {event}")
-
-        # Parse S3 bucket and object key from the event
+        # Extract bucket name and object key from the event notification
         bucket_name = event['Records'][0]['s3']['bucket']['name']
-        file_key = event['Records'][0]['s3']['object']['key']
-        logger.info(f"Bucket: {bucket_name}, File: {file_key}")
+        object_key = event['Records'][0]['s3']['object']['key']
+        logger.info(f"Received file: Bucket={bucket_name}, Key={object_key}")
 
-        # Define local paths for processing
-        download_path = f"/tmp/{os.path.basename(file_key)}"
-        logger.info(f"Downloading file to: {download_path}")
+        # Trigger Amazon Macie to scan the file for sensitive data and potential issues
+        macie_job_id = initiate_macie_scan(bucket_name, object_key)
 
-        # Download the file from S3
-        s3.download_file(bucket_name, file_key, download_path)
+        # Wait for Macie scan to complete (polling for results)
+        scan_results = poll_macie_scan(macie_job_id)
 
-        # Dummy scan logic (replace with your scanner integration)
-        scan_result = dummy_file_scan(download_path)
+        # Check scan results and move the file accordingly
+        if scan_results and len(scan_results) > 0:  # If sensitive data or issues found
+            logger.warning(f"Macie detected sensitive data or issues for file {object_key}.")
+            target_key = f"quarantine/{object_key}"
+        else:  # No sensitive data found (consider it clean)
+            logger.info(f"File {object_key} is clean with no sensitive data detected.")
+            target_key = f"clean/{object_key}"
 
-        # Post-scan actions: Move file to clean or quarantine folder
-        if scan_result == "clean":
-            target_key = f"clean/{file_key}"
-            logger.info(f"File is clean. Moving to: {target_key}")
-        else:
-            target_key = f"quarantine/{file_key}"
-            logger.info(f"File is infected. Moving to: {target_key}")
-
-        # Copy the file to the target folder
-        s3.copy_object(
-            Bucket=bucket_name,
-            CopySource={'Bucket': bucket_name, 'Key': file_key},
-            Key=target_key
-        )
-
-        # Optionally delete the original file
-        logger.info(f"Deleting original file: {file_key}")
-        s3.delete_object(Bucket=bucket_name, Key=file_key)
+        # Move the file to the appropriate folder (quarantine or clean)
+        move_file_to_target(bucket_name, object_key, target_key)
 
         return {
             'statusCode': 200,
-            'body': f"File processed successfully. Moved to: {target_key}"
+            'body': json.dumps(f"File processed and moved to {target_key}")
         }
 
     except Exception as e:
         logger.error(f"Error processing file: {str(e)}")
         return {
             'statusCode': 500,
-            'body': f"Error: {str(e)}"
+            'body': f"Error processing file: {str(e)}"
         }
 
-def dummy_file_scan(file_path):
+def initiate_macie_scan(bucket_name, object_key):
     """
-    Dummy function to simulate a file scan. Replace this with actual scan logic.
-    Returns 'clean' or 'infected'.
+    Initiate a Macie scan job for the uploaded file in S3.
+    
+    Args:
+        bucket_name (str): The name of the S3 bucket.
+        object_key (str): The key of the file in S3.
+    
+    Returns:
+        str: The Macie job ID.
     """
-    # For demonstration, consider files with ".infected" as infected
-    if file_path.endswith(".infected"):
-        return "infected"
-    return "clean"
+    try:
+        response = macie2.create_classification_job(
+            jobType='ONE_TIME',
+            s3JobDefinition={
+                'bucketDefinitions': [{'bucketName': bucket_name}],
+                'include': {'objectKey': object_key},
+            },
+            name=f'MacieScan-{object_key}'
+        )
+        job_id = response['jobId']
+        logger.info(f"Macie scan initiated for {object_key} with job ID: {job_id}")
+        return job_id
+    except Exception as e:
+        logger.error(f"Error initiating Macie scan: {str(e)}")
+        raise e
+
+def poll_macie_scan(job_id):
+    """
+    Poll the Macie scan job until it completes and return the results.
+
+    Args:
+        job_id (str): The Macie classification job ID.
+
+    Returns:
+        list: The results of the Macie scan (if available).
+    """
+    try:
+        # Polling until the Macie scan completes
+        while True:
+            response = macie2.describe_classification_job(jobId=job_id)
+            status = response['jobStatus']
+            logger.info(f"Macie scan job {job_id} status: {status}")
+
+            if status == 'COMPLETE':
+                findings = response['classificationDetails']
+                logger.info(f"Macie scan completed. Findings: {findings}")
+                return findings  # Return the scan results
+            elif status == 'FAILED':
+                logger.error(f"Macie scan job {job_id} failed.")
+                return None
+
+            # If not complete, wait for 10 seconds and check again
+            time.sleep(10)
+
+    except Exception as e:
+        logger.error(f"Error polling Macie scan job: {str(e)}")
+        raise e
+
+def move_file_to_target(bucket_name, object_key, target_key):
+    """
+    Move the file to the target folder in the S3 bucket.
+
+    Args:
+        bucket_name (str): The S3 bucket name.
+        object_key (str): The original object key.
+        target_key (str): The target object key (quarantine or clean).
+    """
+    try:
+        # Copy the file to the target location (quarantine or clean)
+        copy_source = {'Bucket': bucket_name, 'Key': object_key}
+        s3.copy_object(CopySource=copy_source, Bucket=bucket_name, Key=target_key)
+
+        # Optionally delete the original file after moving
+        s3.delete_object(Bucket=bucket_name, Key=object_key)
+
+        logger.info(f"Moved file {object_key} to {target_key}")
+    except Exception as e:
+        logger.error(f"Error moving file {object_key} to {target_key}: {str(e)}")
+        raise e
