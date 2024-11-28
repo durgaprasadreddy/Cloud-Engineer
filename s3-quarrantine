@@ -258,10 +258,10 @@ def lambda_handler(event, context):
         # Check scan results and move the file accordingly
         if scan_results and len(scan_results) > 0:  # If sensitive data or issues found
             logger.warning(f"Macie detected sensitive data or issues for file {object_key}.")
-            target_key = f"065745164732-rak-cloud-test-uae-guard-duty-test-quarrantine/{object_key}"
+            target_key = f"quarrantine/{object_key}"
         else:  # No sensitive data found (consider it clean)
             logger.info(f"File {object_key} is clean with no sensitive data detected.")
-            target_key = f"065745164732--rak-cloud-test-uae-guard-duty-test-clean/{object_key}"
+            target_key = f"clean/{object_key}"
 
         # Move the file to the appropriate folder (quarantine or clean)
         move_file_to_target(bucket_name, object_key, target_key)
@@ -351,7 +351,7 @@ def initiate_macie_scan(bucket_name, object_key):
             jobType='ONE_TIME',
             s3JobDefinition={
                 'bucketDefinitions': [
-                    {'accountId': 065745164732, 'buckets': [bucket_name]}
+                    {'accountId': 04536473245, 'buckets': [bucket_name]}
                 ],
                 'scoping': {
                     'includes': {
