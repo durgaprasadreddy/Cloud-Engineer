@@ -126,3 +126,41 @@ def move_file_to_target(bucket_name, object_key, target_key):
     except Exception as e:
         logger.error(f"Error moving file {object_key} to {target_key}: {str(e)}")
         raise e
+--------------------------------------------------------
+
+def initiate_macie_scan(bucket_name, object_key):
+    """
+    Initiate a Macie scan job for the uploaded file in S3.
+    
+    Args:
+        bucket_name (str): The name of the S3 bucket.
+        object_key (str): The key of the file in S3.
+    
+    Returns:
+        str: The Macie job ID.
+    """
+    try:
+        # Ensure bucket ARN is used if required
+        bucket_arn = f"arn:aws:s3:::{bucket_name}"
+        
+        response = macie2.create_classification_job(
+            jobType='ONE_TIME',
+            s3JobDefinition={
+                'bucketDefinitions': [{'accountId': ACCOUNT_ID, 'buckets': [bucket_name]}],
+                'scoping': {
+                    'includes': {
+                        'and': [
+                            {'simpleScopeTerm': {'key': 'OBJECT_KEY', 'values': [object_key]}}
+                        ]
+                    }
+                }
+            },
+            name=f'MacieScan-{object_key.replace("/", "-")}'
+        )
+        job_id = response['jobId']
+        logger.info(f"Macie scan initiated for {object_key} with job ID: {job_id}")
+        return job_id
+    except Exception as e:
+        logger.error(f"Error initiating Macie scan: {str(e)}")
+        raise e
+
