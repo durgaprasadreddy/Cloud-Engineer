@@ -58,13 +58,22 @@ def initiate_macie_scan(bucket_name, object_key):
         str: The Macie job ID.
     """
     try:
+        # Ensure bucket ARN is used if required
+        bucket_arn = f"arn:aws:s3:::{bucket_name}"
+        
         response = macie2.create_classification_job(
             jobType='ONE_TIME',
             s3JobDefinition={
-                'bucketDefinitions': [{'bucketName': bucket_name}],
-                'include': {'objectKey': object_key},
+                'bucketDefinitions': [{'accountId': ACCOUNT_ID, 'buckets': [bucket_name]}],
+                'scoping': {
+                    'includes': {
+                        'and': [
+                            {'simpleScopeTerm': {'key': 'OBJECT_KEY', 'values': [object_key]}}
+                        ]
+                    }
+                }
             },
-            name=f'MacieScan-{object_key}'
+            name=f'MacieScan-{object_key.replace("/", "-")}'
         )
         job_id = response['jobId']
         logger.info(f"Macie scan initiated for {object_key} with job ID: {job_id}")
@@ -72,7 +81,6 @@ def initiate_macie_scan(bucket_name, object_key):
     except Exception as e:
         logger.error(f"Error initiating Macie scan: {str(e)}")
         raise e
-
 def poll_macie_scan(job_id):
     """
     Poll the Macie scan job until it completes and return the results.
